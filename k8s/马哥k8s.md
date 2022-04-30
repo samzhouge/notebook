@@ -75,7 +75,7 @@ gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors
 EOF
 
 安装软件
-yum install kubelet kubeadm kubectl -y
+yum install -y kubelet kubeadm kubectl
 
 开机启动kubelet，不需要启动  
 systemctl enable kubelet
@@ -95,8 +95,9 @@ kubeadm config images list
 
 开始安装
 ```
-kubeadm init --image-repository=registry.aliyuncs.com/google_containers
+kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository=registry.aliyuncs.com/google_containers
 ```
+注：如果不指定pod-network-cidr，安装flannel网络后，会有问题
 
 最后需要使用普通用户做一些配置，本次使用root
 ```
@@ -104,30 +105,40 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-记录node加入集群命令，给node使用
+记录node加入集群命令，给node加入集群使用
 ```
-kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 --discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
+kubeadm join 192.168.196.11:6443 --token wukhpw.nhdvbxumw9j5l54z --discovery-token-ca-cert-hash sha256:7b359813c95747b3bf82b819d196b133bf55c8e183aadb749d6fd95f3c837ceb
 ```
 
 查看状态
 ```
-kubectl get cs/componentstatus  # 查看组件状态
+kubectl get cs  # 查看组件状态
 kubectl get nodes  # 获取节点信息
 kubectl get ns  # 查看名称空间
 ```
 ## 2.5 安装flannel网络
 不安装的话nodes状态为NoReady
-```
-进入flannel github地址
-https://github.com/flannel-io/flannel
 
+[flannel文档](https://github.com/flannel-io/flannel)
+
+运行命令，进行安装
+```
 kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
-
-kubectl get pos -n kube-system  -o wide  # 看到kube-flannel-ds... 表示安装好了
-kubectl get nodes  # 此时node状态为Ready
 ```
+
+查看命令
+```
+看到kube-flannel-ds... 表示安装好了
+kubectl get pods -n kube-system  -o wide
+
+过一会，node状态为Ready
+kubectl get nodes
+```
+![](imgs/k8s-get-nodes.png)
+
+
 ## 2.6 添加node到集群
 ```
-kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 --discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
+kubeadm join 192.168.196.11:6443 --token wukhpw.nhdvbxumw9j5l54z --discovery-token-ca-cert-hash sha256:7b359813c95747b3bf82b819d196b133bf55c8e183aadb749d6fd95f3c837ceb
 ```
 
