@@ -12,27 +12,24 @@
 * 关闭防火墙
 * 关闭swap
 ### 2.1.1 服务器信息
-192.168.196.11 master
-192.168.196.12 node01
-192.168.196.13 node02
 ````
-/etc/hosts  # 修改如下
+vim /etc/hosts  # 修改如下
 192.168.196.11 master
 192.168.196.12 node01
 192.168.196.13 node02
 
-/etc/resolv.conf  # 修改如下
+vim /etc/resolv.conf  # 修改如下
 search magedu.com
 ````
 
 ## 2.2 安装yum软件
-* docker
-* kubeadmin
+* docker-ce
+* kubeadm
 * kubelet
-* kubectl  # 客户端程序，node可以不安装
-### 2.3 配置yum源和安装
-#### 2.3.1 阿里yum源配置
-* [yum配置docker](https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.3e221b11c9NoqD)  
+* kubectl  # 客户端程序(node可以不安装)
+
+### 2.2.1 docker yum配置和安装 
+#### [阿里文档](https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.3e221b11c9NoqD)  
 ```
 # step 1: 安装必要的一些系统工具
 yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -47,12 +44,26 @@ yum -y install docker-ce
 service docker start
 systemctl enable docker
 ```
-
-* [yum配置k8s](https://developer.aliyun.com/mirror/kubernetes?spm=a2c6h.13651102.0.0.3e221b11c9NoqD)
-
+#### 配置国内镜像
 ```
-两个gpgcheck改成0
+vim /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "registry-mirrors": [
+      "http://hub-mirror.c.163.com",
+      "https://docker.mirrors.ustc.edu.cn"
+  ]
+}
 
+重新加载配置
+systemctl daemon-reload
+systemctl restart docker
+```
+
+### 2.3.2 k8s yum配置和安装
+[阿里源文档](https://developer.aliyun.com/mirror/kubernetes?spm=a2c6h.13651102.0.0.3e221b11c9NoqD)
+```
+新增yum配置(两个gpgcheck改成0)
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
@@ -63,70 +74,60 @@ repo_gpgcheck=0
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 
-# 安装软件
+安装软件
 yum install kubelet kubeadm kubectl -y
 
-# 开机启动kubelet，不需要启动  
+开机启动kubelet，不需要启动  
 systemctl enable kubelet
 ```
+## 2.4 安装master
+### 2.4.1 kubeadm init初始化master  
+[kubeadm init参考](https://k8s.easydoc.net/docs/dRiQjyTY/28366845/6GiNOzyZ/nd7yOvdY)
 
-* 配置docker
-  * 配置国内镜像
-    ```
-    vim /etc/docker/daemon.json
-      {
-      "exec-opts": ["native.cgroupdriver=systemd"],
-      "registry-mirrors": [
-          "http://hub-mirror.c.163.com",
-          "https://docker.mirrors.ustc.edu.cn"
-      ]
-    }
+安装前查看
+```
+查看kueadm默认配置，imageRepository是镜像拉取地址
+kubeadm config print init-defaults
 
+查看需要的镜像
+kubeadm config images list 
+```
 
-    systemctl daemon-reload  # 重新加载配置
-    systemctl restart docker
-    ```
+开始安装
+```
+kubeadm init --image-repository=registry.aliyuncs.com/google_containers
+```
 
-## 2.4 kubeadm安装master
-* kubeadm init初始化master  
-[参考](https://k8s.easydoc.net/docs/dRiQjyTY/28366845/6GiNOzyZ/nd7yOvdY)
-  ```shell
-  # 查看kueadmin默认配置，imageRepository是镜像拉取地址
-  kubeadm config print init-defaults
+最后需要使用普通用户做一些配置，本次使用root
+```
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+```
 
-  # 查看需要的镜像
-  kubeadm config images list 
+记录node加入集群命令，给node使用
+```
+kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 --discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
+```
 
-  最后需要使用普通用户做一些配置，本次使用root
-  kubeadm init --image-repository=registry.aliyuncs.com/google_containers
-
-  mkdir -p $HOME/.kube
-  cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  ```
-* node加入集群命令，先记录下，方便以后ch
-  ```shell
-    kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 \
-	--discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
-  ```
-* 查看状态
-  ```shell
-  kubectl get cs/componentstatus  # 查看组件状态
-  kubectl get nodes  # 获取节点信息
-  kubectl get ns  # 查看名称空间
-  ```
+查看状态
+```
+kubectl get cs/componentstatus  # 查看组件状态
+kubectl get nodes  # 获取节点信息
+kubectl get ns  # 查看名称空间
+```
 ## 2.5 安装flannel网络
-  ```shell
-  进入flannel github地址
-  https://github.com/flannel-io/flannel
+不安装的话nodes状态为NoReady
+```
+进入flannel github地址
+https://github.com/flannel-io/flannel
 
-  kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
 
-  kubectl get pos -n kube-system  -o wide  # 看到kube-flannel-ds... 表示安装好了
-  kubectl get nodes  # 此时node状态为Ready
-  ```
-## kubeadm添加node
-  ```
-  kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 \
-    --discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
-  ```
+kubectl get pos -n kube-system  -o wide  # 看到kube-flannel-ds... 表示安装好了
+kubectl get nodes  # 此时node状态为Ready
+```
+## 2.6 添加node到集群
+```
+kubeadm join 192.168.196.11:6443 --token joy19f.v0rzd9zdsu501d96 --discovery-token-ca-cert-hash sha256:6c9e4bf9478021db569ccc6a71011d0fba337ab440d88041042e51f0468752bc
+```
 
