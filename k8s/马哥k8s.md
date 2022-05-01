@@ -142,3 +142,45 @@ kubectl get nodes
 kubeadm join 192.168.196.11:6443 --token wukhpw.nhdvbxumw9j5l54z --discovery-token-ca-cert-hash sha256:7b359813c95747b3bf82b819d196b133bf55c8e183aadb749d6fd95f3c837ceb
 ```
 
+## 问题排查
+一般情况下，问题出在pod本身，我们可以按照如下步骤进行分析定位问题
+* kubectl get pod  查看是否存在不正常的pod
+* journalctl -u kubelet -f 查看kubelet，是否存在异常日志
+* kubectl logs -n kube-system -f pod/xxxxx
+  * 比如 kubectl logs -f kube-scheduler-master -n kube-system
+
+## pod
+创建pod
+```
+kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80 --dry-run=client
+
+kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80
+```
+查看deployment
+```
+kubectl get deployment
+```
+创建service
+```
+kubectl expose deployment nginx-deploy --name=nginx --port=80 --target-port=80 --protocol=TCP
+```
+查看service
+```
+kubectl get svc -o wide
+```
+解析service nginx的ip
+```
+dig -t A nginx.default.svc.cluster.local @10.96.0.10
+
+10.96.0.10是通过下面命令获取的
+kubectl get svc -n kube-system -o wide
+```
+创建一个客户端去测
+```
+kubectl run client --image=busybox -it --restart=Never
+
+测试是否能访问service nginx
+wget nginx
+或者: wget -O - -q http://nginx:80
+```
+

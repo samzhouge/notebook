@@ -20,9 +20,10 @@ yum provides "*/ifconfig"  # 查询命令所在的包
 
 ## 安装基础软件
 ```shell
-yum install vim tree telnet nmap dos2unix lrzsz nc lsof wget tcpdump htop iftop iotop dstat sysstat nethogs strace psmisc nload bash-completion -y
+yum install vim tree telnet bind-utils nmap dos2unix lrzsz nc lsof wget tcpdump htop iftop iotop dstat sysstat nethogs strace psmisc nload bash-completion -y
 ```
 注:
+bind-utils  # dig
 psmisc # pstree
 sysstat # sar iostat pidstat opstat
 nload # 网卡流量
