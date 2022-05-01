@@ -150,7 +150,7 @@ kubeadm join 192.168.196.11:6443 --token wukhpw.nhdvbxumw9j5l54z --discovery-tok
   * 比如 kubectl logs -f kube-scheduler-master -n kube-system
 
 # 3 kubectl命令快速入门
-创建deployment
+### 3.1 创建deployment
 ```
 dry-run表示不会具体执行
 kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80 --dry-run=client
@@ -166,7 +166,7 @@ kubectl get deployment -w  # 时时刷新 watch
 ```
 kubectl get pods --show-labels
 ```
-创建service
+### 3.2 创建service
 ```
 deployment类型的service
 kubectl expose deployment nginx-deploy --name=nginx --port=80 --target-port=80 --protocol=TCP
@@ -205,7 +205,7 @@ nc -vz nginx 80  # 测试端口连通性
 service信息
 ![](imgs/k8s-describe-svc.png)
 
-scale扩容
+### 3.3 scale扩容缩减pod
 ```
 创建deployment
 kubectl create deployment myapp --image=ikubernetes/myapp:v1 --replicas=2
@@ -239,10 +239,11 @@ kubectl rollout status deployment myapp
 回滚到上一个版本
 kubectl rollout undo deployment myapp
 ```
-编辑service
+### 3.4 edit编辑service
 ```
 kubectl edit svc myapp
 
 比如修改type的ClusterIP为NodePort
 ```
 
+# k8s资源清单定义入门
