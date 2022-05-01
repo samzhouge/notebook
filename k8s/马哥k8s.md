@@ -142,16 +142,17 @@ kubectl get nodes
 kubeadm join 192.168.196.11:6443 --token wukhpw.nhdvbxumw9j5l54z --discovery-token-ca-cert-hash sha256:7b359813c95747b3bf82b819d196b133bf55c8e183aadb749d6fd95f3c837ceb
 ```
 
-## 问题排查
+## 2.7 问题排查
 一般情况下，问题出在pod本身，我们可以按照如下步骤进行分析定位问题
 * kubectl get pod  查看是否存在不正常的pod
 * journalctl -u kubelet -f 查看kubelet，是否存在异常日志
 * kubectl logs -n kube-system -f pod/xxxxx
   * 比如 kubectl logs -f kube-scheduler-master -n kube-system
 
-## pod
-创建pod
+# 3 kubectl命令快速入门
+创建deployment
 ```
+dry-run表示不会具体执行
 kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80 --dry-run=client
 
 kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80
@@ -159,10 +160,20 @@ kubectl create deployment nginx-deploy --image=nginx:1.14-alpine --port=80
 查看deployment
 ```
 kubectl get deployment
+kubectl get deployment -w  # 时时刷新 watch
+```
+查看pod lable信息
+```
+kubectl get pods --show-labels
 ```
 创建service
 ```
+deployment类型的service
 kubectl expose deployment nginx-deploy --name=nginx --port=80 --target-port=80 --protocol=TCP
+or: kubectl expose deployment nginx-deploy --name=nginx
+
+pod类型的service
+kubectl expose pod client --name=client-svc --port=81 --target-port=80 --protocol=TCP
 ```
 查看service
 ```
@@ -175,12 +186,63 @@ dig -t A nginx.default.svc.cluster.local @10.96.0.10
 10.96.0.10是通过下面命令获取的
 kubectl get svc -n kube-system -o wide
 ```
-创建一个客户端去测
+创建一个pod，这个是用来测试的
 ```
 kubectl run client --image=busybox -it --restart=Never
 
 测试是否能访问service nginx
 wget nginx
-或者: wget -O - -q http://nginx:80
+or: wget -O - -q http://nginx:80
+or: telnet nginx 80
+or: nc -vz nginx 80
+```
+busybox中一些测试命令
+```
+nc -l -p 80  # 监听80端口
+nc -vz nginx 80  # 测试端口连通性
+  or: nc nginx 80
+```
+service信息
+![](imgs/k8s-describe-svc.png)
+
+scale扩容
+```
+创建deployment
+kubectl create deployment myapp --image=ikubernetes/myapp:v1 --replicas=2
+
+查看deployment状态
+kubectl get deployment -w
+
+客户端访问
+wget -O - -q 10.244.2.5/hostname.html
+
+创建service
+kubectl expose deployment myapp --name=myapp --port=80
+
+客户端访问service
+while true;do wget -O - -q myapp/hostname.html;sleep 1;done
+
+scale扩展到5个pod
+kubectl scale --replicas=5 deployment myapp
+
+scale缩减到3个pod
+kubectl scale --replicas=3 deployment myapp
+
+更新镜像
+  先查看pod的容器名字
+  kubectl describe pod myapp-9cbc4cf76-2rl2z
+kubectl set image deployment myapp myapp=ikubernetes/myapp:v2
+
+查看进度
+kubectl rollout status deployment myapp
+
+回滚到上一个版本
+kubectl rollout undo deployment myapp
+```
+编辑service
+```
+kubectl edit svc myapp
+
+比如修改type的ClusterIP为NodePort
 ```
 
