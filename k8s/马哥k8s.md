@@ -188,6 +188,9 @@ kubectl get svc -n kube-system -o wide
 ```
 创建一个pod，这个是用来测试的
 ```
+kubectl run client --image=xiaopeng163/net-box --restart=Never -it sh
+
+or:
 kubectl run client --image=busybox -it --restart=Never
 
 测试是否能访问service nginx
