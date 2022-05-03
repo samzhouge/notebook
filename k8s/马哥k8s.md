@@ -249,4 +249,32 @@ kubectl edit svc myapp
 比如修改type的ClusterIP为NodePort
 ```
 
-# k8s资源清单定义入门
+# 4 k8s资源清单定义入门
+## 资源定义例子
+![](imgs/yaml-pod.png)
+
+## 资源
+* apiVersion
+* kind
+* metadata
+* spec
+## 资源帮助
+```
+kubectl explain pods
+特定字段
+kubectl explain pods.metadata
+kubectl explain pods.metadata.name
+```
+## 创建和删除资源
+```
+kubectl create -f pod-demo.yaml
+kubectl delete -f pod-demo.yaml
+```
+##排查命令
+```
+查看log
+kubectl logs -f pod-demo myapp
+
+进入容器
+kubectl exec -it pod-demo myapp -- sh
+```
