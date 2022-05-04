@@ -309,7 +309,6 @@ key=value
 key: 长度63，字母/数字/_-、.，有前缀的话最长253
 value: 长度63，可以使空值，字母数字_-、.，只能字母数字开头结尾
 ```
-
 ### 标签选择器(-l参数)
 ```
 等值关系：= == !=
@@ -338,4 +337,67 @@ nodeSelector:
   disk: ssd
 
 nodename <sting>  指定特定node
+```
+
+# 6 Pod生命周期
+![](../k8s/imgs/pod-life-cycle.png)
+### 健康状态检测 livenessProbe
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-pod
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    command: ['/bin/sh', '-c', 'touch /tmp/health; sleep 30; rm -f /tmp/health; sleep 3600']
+    livenessProbe:
+      initialDelaySeconds: 2
+      periodSeconds: 3
+      exec:
+        command: ['test', '-e', '/tmp/health']
+```
+### 就绪状态检测 readinessProbe
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-pod
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    command: ['/bin/sh', '-c', 'touch /tmp/health; sleep 30; rm -f /tmp/health; sleep 3600']
+    readinessProbe:
+      initialDelaySeconds: 2
+      periodSeconds: 3
+      exec:
+        command: ['test', '-e', '/tmp/health']
+```
+### 容器启动后运行postStart
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: poststart-pod
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    lifecycle:
+      postStart:
+        exec:
+          command: ['/bin/sh', '-c', 'echo 123 >> /index.html']
+    command: ['/bin/sh', '-c', 'httpd -h / && sleep 3600']
+```
+测试
+```
+curl POD_IP  # 可以看到123
 ```
