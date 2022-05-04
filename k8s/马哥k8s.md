@@ -258,6 +258,10 @@ kubectl edit svc myapp
 * kind
 * metadata
 * spec
+查看apiveriosn
+```
+kubectl api-versions
+```
 ## 资源帮助
 ```
 kubectl explain pods
@@ -277,4 +281,61 @@ kubectl logs -f pod-demo myapp
 
 进入容器
 kubectl exec -it pod-demo myapp -- sh
+
+获取pod信息，以yaml格式显示
+kubectl get pod POD -o yaml
+```
+
+# 5 资源配置清单
+## 5.1 资源的清单格式(一级清单)
+* apiVersion(group/version)
+* kind
+* metadata
+## 5.2 Pod资源
+### 修改镜像中的默认应用
+[文档](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
+![](imgs/manifests-container-command-args.png)
+## 5.3 标签
+### 修改标签
+```
+添加pod标签
+kubectl label pod pod-demo release=canary --overwrite
+添加node标签
+kubectl label node node01 disk=ssd
+```
+### 标签定义
+```
+key=value
+key: 长度63，字母/数字/_-、.，有前缀的话最长253
+value: 长度63，可以使空值，字母数字_-、.，只能字母数字开头结尾
+```
+
+### 标签选择器(-l参数)
+```
+等值关系：= == !=
+集合关机：
+  KEY in (VALUE1, VALUE2)
+  KEY notin (VALUE1, VALUE2)
+  KEY
+  !KEY
+
+例子：
+kubectl get pods -l release=stable
+```
+### 资源yaml定义时，标签选择器
+```
+matchLabels: 直接给定键值
+matchExpressions: 基于给定的表达式来定义使用标签选择器，{key:"KEY",operator:"OPERATOR",values:["VAL1","VAL2",...]}
+  操作符:
+    IN NotIn: values字段的值必须为非空列表
+    Exists,NotExists: value字段必须为空列表
+```
+### ##节点标签选择器
+```
+spec下面定义，和containers同级，选择有特定标签的node
+nodeSelector <map[string]string> 节点选择器
+nodeSelector:
+  disk: ssd
+
+nodename <sting>  指定特定node
 ```
