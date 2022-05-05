@@ -395,7 +395,7 @@ spec:
       postStart:
         exec:
           command: ['/bin/sh', '-c', 'echo 123 >> /index.html']
-    command: ['/bin/sh', '-c', 'httpd -h / && sleep 3600']
+    command: ['/bin/sh', '-c', 'httpd -h / && tail -f /dev/null']
 ```
 测试
 ```
