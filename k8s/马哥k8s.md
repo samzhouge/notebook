@@ -175,18 +175,18 @@ or: kubectl expose deployment nginx-deploy --name=nginx
 pod类型的service
 kubectl expose pod client --name=client-svc --port=81 --target-port=80 --protocol=TCP
 ```
-查看service
+#### 查看service
 ```
 kubectl get svc -o wide
 ```
-解析service nginx的ip
+#### 解析service nginx的dns ip
 ```
 dig -t A nginx.default.svc.cluster.local @10.96.0.10
 
 10.96.0.10是通过下面命令获取的
 kubectl get svc -n kube-system -o wide
 ```
-创建一个pod，这个是用来测试的
+#### 创建一个pod，这个是用来测试的
 ```
 kubectl run client --image=xiaopeng163/net-box --restart=Never -it sh
 
@@ -291,11 +291,16 @@ kubectl get pod POD -o yaml
 * apiVersion(group/version)
 * kind
 * metadata
+* status(只读)
 ## 5.2 Pod资源
 ### 修改镜像中的默认应用
 [文档](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
 ![](imgs/manifests-container-command-args.png)
-## 5.3 标签
+## 5.3 标签label
+### 查看pod时显示标签
+```
+kubectl get pods --show-labels
+```
 ### 修改标签
 ```
 添加pod标签
@@ -309,10 +314,10 @@ key=value
 key: 长度63，字母/数字/_-、.，有前缀的话最长253
 value: 长度63，可以使空值，字母数字_-、.，只能字母数字开头结尾
 ```
-### 标签选择器(-l参数)
+### kubectl命令，-l参数标签选择器
 ```
 等值关系：= == !=
-集合关机：
+集合关系：
   KEY in (VALUE1, VALUE2)
   KEY notin (VALUE1, VALUE2)
   KEY
@@ -320,6 +325,7 @@ value: 长度63，可以使空值，字母数字_-、.，只能字母数字开�
 
 例子：
 kubectl get pods -l release=stable
+kubectl get pods -l "release in (stable, canary)"
 ```
 ### 资源yaml定义时，标签选择器
 ```
@@ -327,9 +333,16 @@ matchLabels: 直接给定键值
 matchExpressions: 基于给定的表达式来定义使用标签选择器，{key:"KEY",operator:"OPERATOR",values:["VAL1","VAL2",...]}
   操作符:
     IN NotIn: values字段的值必须为非空列表
-    Exists,NotExists: value字段必须为空列表
+    Exists NotExists: value字段必须为空列表
+
+例子：
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: logstor
 ```
-### ##节点标签选择器
+### 节点标签选择器
 ```
 spec下面定义，和containers同级，选择有特定标签的node
 nodeSelector <map[string]string> 节点选择器
@@ -400,4 +413,78 @@ spec:
 测试
 ```
 curl POD_IP  # 可以看到123
+```
+# 7 控制器
+## Deployment结构
+![](imgs/controller-deployment.png)
+
+### ReplicaSet
+
+### Deployment
+
+
+#### patch打补丁更新
+
+### 实验：通过filebeat传日志给reids，通过service的主机名通信，filebeat运行在每个node
+#### 创建Deployment和DaemonSet
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: logstor
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: logstor
+    spec:
+      containers:
+      - name: redis
+        image: redis:4.0-alpine
+        ports:
+        - name: redis
+          containerPort: 6379
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat-ds
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: filebeat
+      release: stable
+  template:
+    metadata:
+      labels:
+        app: filebeat
+        release: stable
+    spec:
+      containers:
+      - name: filebeat
+        image: ikubernetes/filebeat:5.6.5-alpine
+        env:
+        - name: REDIS_HOST
+          value: redis.default.svc.cluster.local
+        - name: REDIS_LOG_LEVEL
+          value: info
+```
+#### 创建service
+```
+kubectl expose deployment redis --port=6379
+```
+#### 查看filebeat pod，在每个node
+````
+[root@master ~]# kubectl get pods -l app=filebeat -o wide
+NAME  READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES
+filebeat-ds-85qqq 1/1 Running 0 31m 10.244.2.39 node02 <none> <none>
+filebeat-ds-p4spt 1/1 Running 0 31m 10.244.1.33 node01 <none> <none>
 ```
