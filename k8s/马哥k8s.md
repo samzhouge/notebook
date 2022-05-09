@@ -314,7 +314,7 @@ key=value
 key: 长度63，字母/数字/_-、.，有前缀的话最长253
 value: 长度63，可以使空值，字母数字_-、.，只能字母数字开头结尾
 ```
-### kubectl命令，-l参数标签选择器
+### kubectl命令，-l参数，标签过滤
 ```
 等值关系：= == !=
 集合关系：
@@ -415,18 +415,72 @@ spec:
 curl POD_IP  # 可以看到123
 ```
 # 7 控制器
-## Deployment结构
+* ReplicaSet
+* Deployment
+* DaemonSet(守护进程类)
+* Job
+* Cronjob
+* StatfulSet
+## 7.1 Deployment
+### 7.1.1 Deployment架构
 ![](imgs/controller-deployment.png)
+### 7.1.2 配置文件
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-demo
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+      release: canary
+  template:
+    metadata:
+      labels:
+        app: myapp
+        release: canary
+    spec:
+      containers:
+      - name: myapp
+        image: ikubernetes/myapp:v1
+        ports:
+        - name: http
+          containerPort: 80  
+```
+### 7.1.3 部署apply
+```
+kubectl apply -f deployment-demo.yaml
+```
+### 7.1.4 查看deploymeng情况
+![](imgs/deploy-status.png)
 
-### ReplicaSet
+### 7.1.5 查看历史版本
+![](imgs/deploy-history.png)
+修改image版本为myapp:v2后，有两个版本，rs也有两个，原来那个pod数量为0
+### 7.1.6 patch打补丁更新
+```
+kubectl patch deploy deploy-demo -p '{"spec":{"replicas":5}}'
 
-### Deployment
+kubectl patch deploy deploy-demo -p '{"spec":{"strategy":{"rollingUpdate":{"maxSurge": 1, "maxUnavailable": 2}}}}'
+```
+### 7.1.7 只更新一个pod，就暂停，金丝雀发布
+```
+先指定滚动更新策略，大于1，不能少。这样就可以只新增一个后暂停。
+kubectl patch deploy deploy-demo -p '{"spec":{"strategy":{"rollingUpdate":{"maxSurge": 1, "maxUnavailable": 0}}}}'
 
+新增一个后立即暂停
+kubectl set image deploy deploy-demo myapp=ikubernetes/myapp:v2 && kubectl rollout pause deploy deploy-demo
 
-#### patch打补丁更新
-
-### 实验：通过filebeat传日志给reids，通过service的主机名通信，filebeat运行在每个node
-#### 创建Deployment和DaemonSet
+恢复部署
+kubectl rollout resume deploy deploy-demo
+```
+效果就像是金丝雀canary发布
+![](imgs/rollout-pause.png)
+## 7.2 实验：通过filebeat传日志给reids，通过service的主机名通信，filebeat运行在每个node
+### 创建Deployment和DaemonSet
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -477,11 +531,11 @@ spec:
         - name: REDIS_LOG_LEVEL
           value: info
 ```
-#### 创建service
+### 创建service
 ```
 kubectl expose deployment redis --port=6379
 ```
-#### 查看filebeat pod，在每个node
+### 查看filebeat pod，在每个node
 ````
 [root@master ~]# kubectl get pods -l app=filebeat -o wide
 NAME  READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES
