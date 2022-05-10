@@ -536,9 +536,78 @@ spec:
 kubectl expose deployment redis --port=6379
 ```
 ### 查看filebeat pod，在每个node
-````
+```
 [root@master ~]# kubectl get pods -l app=filebeat -o wide
 NAME  READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES
 filebeat-ds-85qqq 1/1 Running 0 31m 10.244.2.39 node02 <none> <none>
 filebeat-ds-p4spt 1/1 Running 0 31m 10.244.1.33 node01 <none> <none>
+```
+# 8 Service资源
+## 8.1 工作模式
+* userspace: 1.1-
+* iptables: 1.10-
+* ipvs: 1.11-
+
+userspace
+![](imgs/service_1.png)
+iptables
+![](imgs/service_2.png)
+ipvs
+![](imgs/service_3.png)
+
+## 8.2 svc ClusterIP
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  namespace: default
+spec:
+  selector:
+    app: myapp
+    release: canary
+  type: ClusterIP
+  clusterIP: 10.99.99.99
+  ports:
+  - port: 80
+    targetPort: 80
+```
+## 8.3 svc NodeIP
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-nodeip-svc
+  namespace: default
+spec:
+  selector:
+    app: myapp
+    release: canary
+  type: NodePort
+  clusterIP: 10.99.88.88
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+```
+## 8.4 svc headless
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-headless-svc
+  namespace: default
+spec:
+  selector:
+    app: myapp
+    release: canary
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 80
+    targetPort: 80
+```
+查看svc的ip
+```
+dig -t A myapp-headless-svc.default.svc.cluster.local @10.96.0.10
 ```
