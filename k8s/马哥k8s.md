@@ -611,3 +611,99 @@ spec:
 ```
 dig -t A myapp-headless-svc.default.svc.cluster.local @10.96.0.10
 ```
+# 9 ingress
+## ingress架构
+![](imgs/ingress-arch.png)
+[github地址](https://github.com/kubernetes/ingress-nginx)
+## ingress安装
+[安装和配置参考](https://www.jianshu.com/p/ea88a0ceac19)
+```
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/baremetal/deploy.yaml
+
+修改deploy.yaml
+一处
+anjia0532/google-containers.ingress-nginx.controller:v1.2.0
+两处
+anjia0532/google-containers.ingress-nginx.kube-webhook-certgen:v1.1.1
+
+kubectl apply -f deploy.yaml
+```
+注：里面定义了一个Service:ingress-nginx-controller，类型是NodePort，端口随机(比如31515)，是用来外部访问使用的。
+访问：192.168.196.12:31515。如果使用固定端口，可以修改deploy.yaml，添加nodePort:30080，这样就可以使用192.168.196.12:30080访问。
+
+## 例子
+定义deploy和service
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  namespace: default
+spec:
+  selector:
+    app: myapp
+    release: canary
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-demo
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: myapp
+      release: canary
+  template:
+    metadata:
+      labels:
+        app: myapp
+        release: canary
+    spec:
+      containers:
+      - name: myapp
+        image: ikubernetes/myapp:v1
+        ports:
+        - name: http
+          containerPort: 80
+```
+
+ingress文件(ingress-myapp.yaml)
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-myapp
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: myapp.magedu.com
+    http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-svc
+            port:
+              number: 80
+```
+创建ingress
+```
+kubectl apply -f ingress-myapp.yaml
+```
+查看节点对应端口(80:31515/TCP)
+```
+kubectl get svc -n ingress-nginx
+```
+访问页面
+```
+curl myapp.magedu.com:31515
+```
