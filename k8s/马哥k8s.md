@@ -707,3 +707,54 @@ kubectl get svc -n ingress-nginx
 ```
 curl myapp.magedu.com:31515
 ```
+# 10 volume存储卷
+## 自主式存储卷
+### emptyDir
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-demo
+  namespace: default
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html/
+  - name: busybox
+    image: busybox:latest
+    volumeMounts:
+    - name: html
+      mountPath: /data/
+    command:
+    - "/bin/sh"
+    - "-c"
+    - "echo $(date) >> /data/index.html;sleep 3600"
+  volumes:
+  - name: html
+    emptyDir: {}
+```
+### hostPath
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-vol-hostpath
+  namespace: default
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html/
+  volumes:
+  - name: html
+    hostPath:
+      path: /data/
+      type: DirectoryOrCreate
+```
