@@ -708,8 +708,8 @@ kubectl get svc -n ingress-nginx
 curl myapp.magedu.com:31515
 ```
 # 10 volume存储卷
-## 自主式存储卷
-### emptyDir
+## 10.1 自主式存储卷
+### 10.1.1 emptyDir
 ```
 apiVersion: v1
 kind: Pod
@@ -738,7 +738,7 @@ spec:
   - name: html
     emptyDir: {}
 ```
-### hostPath
+### 10.1.2 hostPath
 ```
 apiVersion: v1
 kind: Pod
@@ -757,4 +757,165 @@ spec:
     hostPath:
       path: /data/
       type: DirectoryOrCreate
+```
+### 10.1.3 nfs
+nfs服务器安装配置
+```
+yum -y install nfs-utils
+mkdir -p /data/volumes
+echo "nfs server" >> /data/volumes/index.html
+vim /etc/exports
+/data/volumes 192.168.196.0/24(rw,no_root_squash)
+systemctl start nfs
+
+node节点上测试挂载
+mount -t nfs master:/data/volumes /mnt
+卸载
+umount /mnt
+```
+nfs-yaml
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-vol-nfs
+  namespace: default
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html/
+  volumes:
+  - name: html
+    nfs:
+      path: /data/volumes
+      server: master
+```
+## 10.2 pv
+```
+mkdir -p /data/volumes/v{1..5}
+/data/volumes/v1 192.168.196.0/24(rw,no_root_squash)
+/data/volumes/v2 192.168.196.0/24(rw,no_root_squash)
+/data/volumes/v3 192.168.196.0/24(rw,no_root_squash)
+/data/volumes/v4 192.168.196.0/24(rw,no_root_squash)
+/data/volumes/v5 192.168.196.0/24(rw,no_root_squash)
+重新加载配置
+exportfs -arv
+查看
+showmount -e
+```
+pv配置(nfs存储)
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv001
+  labels:
+    name: pv001
+spec:
+  nfs:
+    path: /data/volumes/v1
+    server: master
+  accessModes: ["ReadWriteOnce", "ReadWriteMany"]
+  capacity:
+    storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv002
+  labels:
+    name: pv002
+spec:
+  nfs:
+    path: /data/volumes/v2
+    server: master
+  accessModes: ["ReadWriteOnce", "ReadWriteMany"]
+  capacity:
+    storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv003
+  labels:
+    name: pv003
+spec:
+  nfs:
+    path: /data/volumes/v3
+    server: master
+  accessModes: ["ReadWriteOnce", "ReadWriteMany"]
+  capacity:
+    storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv004
+  labels:
+    name: pv004
+spec:
+  nfs:
+    path: /data/volumes/v4
+    server: master
+  accessModes: ["ReadWriteOnce", "ReadWriteMany"]
+  capacity:
+    storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv005
+  labels:
+    name: pv005
+spec:
+  nfs:
+    path: /data/volumes/v5
+    server: master
+  accessModes: ["ReadWriteOnce", "ReadWriteMany"]
+  capacity:
+    storage: 5Gi
+```
+查看
+```
+kubectl get pv
+```
+### Released状态恢复
+```
+kubectl edit pv pv003
+删除claimRef这段内容
+```
+### pv被pvc绑定着，删除pv，会显示Terminating
+## 10.3 pvc
+![](imgs/pvc架构.png)
+pvc配置
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources:
+    requests:
+      storage: 6Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-vol-pvc
+  namespace: default
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html/
+  volumes:
+  - name: html
+    persistentVolumeClaim:
+      claimName: mypvc
 ```
