@@ -919,3 +919,80 @@ spec:
     persistentVolumeClaim:
       claimName: mypvc
 ```
+## configmap
+创建cm，从命令行
+```
+kubectl create configmap nginx-config --from-literal=nginx_port=80 --from-literal=server_name=myapp.magedu.com
+```
+查看
+```
+kubectl get cm
+kubectl get cm nginx-conf -o yaml
+kubectl describe cm nginx-config
+```
+创建cm，从文件名
+```
+vim www.conf
+server {
+	server_name myapp.magedu.com;
+	listen 80;
+	root /data/web/html/;
+}
+
+kubectl create configmap nginx-www --from-file=./www.conf
+```
+创建pod，env中带cm
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-cm-1
+  namespace: default
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    env:
+    - name: NGINX_SERVER_PORT
+      valueFrom:
+        configMapKeyRef:
+          name: nginx-config
+          key: nginx_port
+    - name: NGINX_SERVER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: nginx-config
+          key: server_name
+```
+验证
+```
+kubectl exec -it pod-cm-1 -- printenv
+```
+创建pod，挂载cm
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-cm-2
+  namespace: default
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: nginxconf
+      mountPath: /etc/nginx/config.d/
+      readOnly: true
+  volumes:
+  - name: nginxconf
+    configMap:
+      name: nginx-config
+```
+验证
+```
+kubectl exec -it pod-cm-2 -- ls /etc/nginx/config.d/
+```
