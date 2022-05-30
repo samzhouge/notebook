@@ -996,3 +996,13 @@ spec:
 ```
 kubectl exec -it pod-cm-2 -- ls /etc/nginx/config.d/
 ```
+## statefulset
+
+### nslookup
+```
+pod_name.service_name.ns_name.svc.cluster.local
+```
+# 11 serviceaccount
+## API
+Request path  
+http://192.168.196.11:6443/apis/apps/v1/namespaces/default/deployments/myapp-deploy/
