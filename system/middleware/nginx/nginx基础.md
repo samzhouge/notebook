@@ -133,7 +133,7 @@ http {
     default_type   application/octet-stream;
     sendfile          on;
     keepalive_timeout   65;
-    upstream www_pools {                   #<==这里是定义Web服务器池，包含了9、10两个Web节点。
+    upstream www_pools {                   #<==这里是定义Web服务器池，包含了7、8两个Web节点。
         server 10.0.0.7:80   weight=1;
         server 10.0.0.8:80   weight=1;
     }
@@ -188,7 +188,7 @@ upstream backend {
 }
 ```
 ### upstream模块内部server标签参数说明
-![](imgs/location.png)
+![](imgs/upstream.png)
 
 ### 负载算法
 * rr（默认调度算法，静态调度算法）
@@ -200,7 +200,7 @@ upstream backend {
   * 此算法会根据后端节点服务器的响应时间来分配请求，响应时间短的优先分配。这是更加智能的调度算法。此种算法可以依据页面大小和加载时间长短智能地进行负载均衡，也就是根据后端服务器的响应时间来分配请求，响应时间短的优先分配。Nginx本身是不支持fair调度算法的，如果需要使用这种调度算法，必须下载Nginx的相关模块upstream_fair。
 * url_hash算法（动态调度算法）
   * 和ip_hash类似，这里是根据访问URL的hash结果来分配请求的，让每个URL定向到同一个后端服务器，后端服务器为缓存服务器时效果显著。在upstream中加入hash语句，server语句中不能写入weight等其他的参数，hash_method使用的是hash算法。
-* 一致性hash算法（动态调度算法
+* 一致性hash算法（动态调度算法）
   * 一致性hash算法一般用于代理后端业务为缓存服务（Squid、Memcached）的场景，通过将用户请求的URI或者指定字符串进行计算，然后调度到后端的服务器上，此后任何用户查找同一个URI或者指定字符串都会被调度到这一台服务器上，因此后端的每个节点缓存的内容都是不同的，一致性hash算法可以使后端某个或几个节点宕机后缓存的数据动荡的最小。
 
 ```
@@ -240,13 +240,11 @@ upstream oldboy_lb {
 }
 
 **consistent_hash**
-http {
-    upstream test {
-        consistent_hash $request_uri;
-        server 127.0.0.1:9001 id=1001 weight=3;
-        server 127.0.0.1:9002 id=1002 weight=10;
-        server 127.0.0.1:9003 id=1003 weight=20;
-    }
+upstream test {
+    consistent_hash $request_uri;
+    server 127.0.0.1:9001 id=1001 weight=3;
+    server 127.0.0.1:9002 id=1002 weight=10;
+    server 127.0.0.1:9003 id=1003 weight=20;
 }
 ```
 ### proxy_pass指令
@@ -265,7 +263,59 @@ location /name/ {
 ```
 #### http_proxy_module相关参数
 ![](imgs/proxy_pass.png)
-### Nginx负载均衡反向代理相关实践
+
+#### 代理转发规则
+* 规律
+  * proxy_pass带路径：删除location匹配到的regex后，加到proxy_pass后的url
+  * proxy_pass不带路径：url直接加到proxy_pass后的url
+```
+访问地址：http://localhost/proxy/abc.html
+
+**1、第一种**
+location /proxy/ {
+    proxy_pass http://127.0.0.1:8080/;
+}
+代理到：http://127.0.0.1:8080/abc.html
+
+**2、第二种**
+location /proxy/ {
+    proxy_pass http://127.0.0.1:8080;
+}
+相对于第一种proxy_pass缺少/
+代理到：http://127.0.0.1:8080/proxy/abc.html
+
+**3、第三种**
+location /proxy/ {
+    proxy_pass http://127.0.0.1:8080/api/;
+}
+代理到：http://127.0.0.1:8080/api/abc.html
+
+**4、第四种**
+location /proxy/ {
+    proxy_pass http://127.0.0.1:8080/api;
+}
+相对第三种少/
+代理到：http://127.0.0.1:8080/apiabc.html
+
+location /proxy {
+proxy_pass http://127.0.0.1:8080/api;
+}
+代理到：http://127.0.0.1:8080/api/abc.html
+
+**5、第五种**
+location /proxy {
+    proxy_pass http://127.0.0.1:8080/;
+}
+代理到：http://127.0.0.1:8080//abc.html
+注意此处有两个反斜杠//
+
+location /proxy {
+    proxy_pass http://127.0.0.1:8080;
+}
+代理到：http://127.0.0.1:8080/proxy/abc.html
+```
+
+### Nginx负载均衡反向代理
 #### 例子1 利用upstream定义一组WWW服务器池
 ```
 [root@lb01 conf]# cat nginx.conf
