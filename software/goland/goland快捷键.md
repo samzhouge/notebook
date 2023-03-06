@@ -2,10 +2,9 @@
 ## 快捷键
 ### Mac 快捷键
 ![](images/Mac按键.png)
+* [x] 切换窗口 control tab
 * 删除 delete
 * 右删除 fn delete
-* 右制表符 delete
-* 左制表符 fn delete
 * Home fn ←
 * End fn →
 * Page Up fn ↑
@@ -13,18 +12,21 @@
 * 切换桌面 control ↑↓←→
 
 ### Shortcuts 捷径
+* [x] 最近修改过的名字 command e
 * 重命名 shift F6
 
 ### General 常用
+* [x] 设置 command ,
 * 折叠左边目录树 command 1 
+* 书签栏 command 2
 * 定位文件所在目录树 alt F1
-* 设置 command ,
 
 ### Usage Search 变量搜索
 * 哪些地方使用到 command F7
 
 ### Editing 文本编辑
-* 完成语句，自动会加{}等 command shift enter
+* [x] 完成语句，自动会加{}等 command shift enter
+* 调整一行位置 command shift ↑
 * 删除一行 control y/command delete(mac)
 * 删除至单词结尾 alt delete
 * 删除至单词开头 alt fn delete
@@ -37,7 +39,16 @@
 * 嵌入代码块(如if else) command alt t
 
 ## Navigation 导航
-* 书签 F3
-* alt F3 助记符标签
-  * 跳转到组肌肤标签 control 1(这个是助记符)
-*
+* [x] 快速查看定义的内容 alt space
+* [x] 文件结构弹框 command F12
+* 跳转窗口 command alt →
+* 书签 
+  * 设置书签 F3
+  * 助记符标签 alt F3
+    * 跳转到助记标签 control 1(这个是助记符)
+  * 展示助记 command F3
+* 跳转到最后的编辑位置 command shift delete
+* 进入源码 command ↓|F4
+* 跳转到编辑 esc
+* 跳转到某行 command l
+* 
