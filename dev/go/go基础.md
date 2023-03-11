@@ -4,27 +4,27 @@
 [教程](https://www.jianshu.com/p/4e699ff478a5)
 
 ### 路径说明
-假设安装路径为：D:/software/go 代码路径：D:/data
-GOROOT是安装路径
-GOPATH是源码和第三包安装位置
-代码放在D:/data/src下
-go get xxx 下载的包在D:/data/pkg下，可执行文件在D:/data/bin下
+* 假设安装路径为：D:/software/go 代码路径：D:/data
+* GOROOT是安装路径
+* GOPATH是源码和第三包安装位置
+* 代码放在D:/data/src下
+* go get xxx 下载的包在D:/data/pkg下，可执行文件在D:/data/bin下
 
 ### win环境变量设置
-GOROOT=D:/software/go
-GOPATH=D:/data
-两个的bin都加入PATH中，为了让第三方安装的可执行文件可以运行
-PATH=%GOROOT%/bin;%GOPATH%/bin
+* GOROOT=D:/software/go
+* GOPATH=D:/data
+* 两个的bin都加入PATH中，为了让第三方安装的可执行文件可以运行
+* PATH=%GOROOT%/bin;%GOPATH%/bin
 
 ### 命令行设置设置go环境变量 GOROOT和GOPATH配置
-go env -w GOPROXY=https://goproxy.io,direct
-go env -w GO111MODULE=on
-go env  # 查看环境变量
+* go env -w GOPROXY=https://goproxy.io,direct
+* go env -w GO111MODULE=on
+* go env  # 查看环境变量
 
 ### GoLand 项目的Preferences配置
-GOROOT=/usr/local/go
-GOPATH=/Users/samzhou/Desktop/studygo/go
-GOMODULE=GOPROXY=https://goproxy.io,direct;GO111MODULE=on
+* GOROOT=/usr/local/go
+* GOPATH=/Users/samzhou/Desktop/studygo/go
+* GOMODULE=GOPROXY=https://goproxy.io,direct;GO111MODULE=on
 
 ## Go系列教程
 [Go系列教程](https://studygolang.com/subject/2)
