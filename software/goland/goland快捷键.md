@@ -16,6 +16,7 @@
 * 重命名 shift F6
 
 ### General 常用
+* [x] 切换窗口 alt →
 * [x] 设置 command ,
 * 折叠左边目录树 command 1 
 * 书签栏 command 2
@@ -51,4 +52,15 @@
 * 进入源码 command ↓|F4
 * 跳转到编辑 esc
 * 跳转到某行 command l
+
+
+---
+## [GoLand常用快捷键](https://blog.51cto.com/quantfabric/2294263)
+## 查看
+* CTRL+Q 显示注释文档CTRL+SHIFT+I 简短查看源定义
+
+## 自动代码
+* CTRL+ALT+V 自动生成表达式返回值
+* ALT+INSERT 生成代码(如GET,SET方法,构造函数等)
+* CTRL+I 实现接口
 * 

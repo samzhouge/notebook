@@ -8,6 +8,8 @@
 ## 1-4 IntelliJ Idea 的安装和配置
 ### Idea 编辑器
 * 安装插件go
+* 安装goimports
+  * go get ...
 * 安装插件file watcher
   * 添加 goimports
 * 隐藏参数提示（对java有用，go不太有用）
@@ -18,4 +20,7 @@
 * editor/code style/go/sorting type/选择 goimports(默认是gofmt)
 * 隐藏参数
   * show parameter hints/去掉 GO
-tidy
+## 2-3 常量与枚举
+* consts 数值可以作为各种类型使用
+  * consts filename = "abc.txt"  // 不定义类型
+  * 枚举 iota
