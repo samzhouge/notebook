@@ -24,3 +24,5 @@
 * consts 数值可以作为各种类型使用
   * consts filename = "abc.txt"  // 不定义类型
   * 枚举 iota
+* rune 字符串类型 int32别名
+### 2-4 条件语句

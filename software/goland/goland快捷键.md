@@ -1,5 +1,5 @@
 
-## 快捷键
+# MscOS快捷键
 ### Mac 快捷键
 ![](images/Mac按键.png)
 * [x] 切换窗口 control tab
@@ -54,13 +54,20 @@
 * 跳转到某行 command l
 
 
+# Windows快捷键
 ---
 ## [GoLand常用快捷键](https://blog.51cto.com/quantfabric/2294263)
 ## 查看
 * CTRL+Q 显示注释文档CTRL+SHIFT+I 简短查看源定义
 
 ## 自动代码
-* CTRL+ALT+V 自动生成表达式返回值
+* [x] CTRL+ALT+V 自动生成表达式返回值（比如v,err=func()）
 * ALT+INSERT 生成代码(如GET,SET方法,构造函数等)
 * CTRL+I 实现接口
-* 
+* [x] 自定义模板
+  * 转到 Preferences | Editor | Live Templates，并点击 +，新增动态模板
+
+# Keymap
+* 自定义光标跳转行尾
+  * 行尾 ctrl ;
+  * 行首 ctrl shift ;
