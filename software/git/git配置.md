@@ -11,6 +11,8 @@
   * git config --global user.email abc@email.com
 
 ## 回滚远程分支
+### [教程](https://www.jianshu.com/p/b7498be122da)
+### 命令
 ```
 # 获取将要回滚到的版本号
 git log [--pretty=oneline --abbrev-commit]# 回滚提交（本地回滚）
@@ -19,7 +21,7 @@ git reset --hard commentId
 git push -f [origin xxx]
 ```
 
-## 需要通知同分支的开发人员
+### 需要通知同分支的开发人员
 ![](images/git_reset.png)
 * 本地使用reset回退版本；
 * 强行push -f到远程；
