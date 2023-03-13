@@ -13,9 +13,15 @@
 ## 回滚远程分支
 ```
 # 获取将要回滚到的版本号
-git log [--pretty=oneline --abbrev-commit]
-# 回滚提交（本地回滚）
+git log [--pretty=oneline --abbrev-commit]# 回滚提交（本地回滚）
 git reset --hard commentId
 # 强制提交到远程分支
 git push -f [origin xxx]
 ```
+
+## 需要通知同分支的开发人员
+![](images/git_reset.png)
+* 本地使用reset回退版本；
+* 强行push -f到远程；
+* 同事使用pull命令拉取服务器代码；
+* 所有同事本地都要使用reset来回退版本；
