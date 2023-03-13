@@ -23,8 +23,10 @@ go env  # 查看环境变量
 
 ### GoLand 项目的Preferences配置
 GOROOT=/usr/local/go
-GOPATH=/Users/samzhou/Desktop/studygo/go
+GOPATH=/Users/samzhou/Desktop/studycode/studygo/gopath
 GOMODULE=GOPROXY=https://goproxy.io,direct;GO111MODULE=on
+
+右击go.mod，点击Go Mod Tidy，下载go模块
 
 ## Go系列教程
 [Go系列教程](https://studygolang.com/subject/2)
