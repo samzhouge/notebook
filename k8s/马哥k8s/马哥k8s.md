@@ -2,9 +2,9 @@
 
 # 1 概要
 ## 1.1 组件
-![](../k8s/imgs/k8s组件.png)
+![](images/k8s组件.png)
 ### 1.2 网络
-![](imgs/k8s网络.png)
+![](images/k8s网络.png)
 
 # 2 kubeadmin安装k8s
 ## 2.1 环境
@@ -134,7 +134,7 @@ kubectl get pods -n kube-system  -o wide
 过一会，node状态为Ready
 kubectl get nodes
 ```
-![](imgs/k8s-get-nodes.png)
+![](images/k8s-get-nodes.png)
 
 
 ## 2.6 添加node到集群
@@ -206,7 +206,7 @@ nc -vz nginx 80  # 测试端口连通性
   or: nc nginx 80
 ```
 service信息
-![](imgs/k8s-describe-svc.png)
+![](images/k8s-describe-svc.png)
 
 ### 3.3 scale扩容缩减pod
 ```
@@ -251,7 +251,7 @@ kubectl edit svc myapp
 
 # 4 k8s资源清单定义入门
 ## 资源定义例子
-![](imgs/yaml-pod.png)
+![](images/yaml-pod.png)
 
 ## 资源
 * apiVersion
@@ -295,7 +295,7 @@ kubectl get pod POD -o yaml
 ## 5.2 Pod资源
 ### 修改镜像中的默认应用
 [文档](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
-![](imgs/manifests-container-command-args.png)
+![](images/manifests-container-command-args.png)
 ## 5.3 标签label
 ### 查看pod时显示标签
 ```
@@ -353,7 +353,7 @@ nodename <sting>  指定特定node
 ```
 
 # 6 Pod生命周期
-![](../k8s/imgs/pod-life-cycle.png)
+![](images/pod-life-cycle.png)
 ### 健康状态检测 livenessProbe
 ```yaml
 apiVersion: v1
@@ -423,7 +423,7 @@ curl POD_IP  # 可以看到123
 * StatfulSet
 ## 7.1 Deployment
 ### 7.1.1 Deployment架构
-![](imgs/controller-deployment.png)
+![](images/controller-deployment.png)
 ### 7.1.2 配置文件
 ```yaml
 apiVersion: apps/v1
@@ -455,10 +455,10 @@ spec:
 kubectl apply -f deployment-demo.yaml
 ```
 ### 7.1.4 查看deploymeng情况
-![](imgs/deploy-status.png)
+![](images/deploy-status.png)
 
 ### 7.1.5 查看历史版本
-![](imgs/deploy-history.png)
+![](images/deploy-history.png)
 修改image版本为myapp:v2后，有两个版本，rs也有两个，原来那个pod数量为0
 ### 7.1.6 patch打补丁更新
 ```
@@ -478,7 +478,7 @@ kubectl set image deploy deploy-demo myapp=ikubernetes/myapp:v2 && kubectl rollo
 kubectl rollout resume deploy deploy-demo
 ```
 效果就像是金丝雀canary发布
-![](imgs/rollout-pause.png)
+![](images/rollout-pause.png)
 ## 7.2 实验：通过filebeat传日志给reids，通过service的主机名通信，filebeat运行在每个node
 ### 创建Deployment和DaemonSet
 ```yaml
@@ -549,11 +549,11 @@ filebeat-ds-p4spt 1/1 Running 0 31m 10.244.1.33 node01 <none> <none>
 * ipvs: 1.11-
 
 userspace
-![](imgs/service_1.png)
+![](images/service_1.png)
 iptables
-![](imgs/service_2.png)
+![](images/service_2.png)
 ipvs
-![](imgs/service_3.png)
+![](images/service_3.png)
 
 ## 8.2 svc ClusterIP
 ```
@@ -613,7 +613,7 @@ dig -t A myapp-headless-svc.default.svc.cluster.local @10.96.0.10
 ```
 # 9 ingress
 ## ingress架构
-![](imgs/ingress-arch.png)
+![](images/ingress-arch.png)
 [github地址](https://github.com/kubernetes/ingress-nginx)
 ## ingress安装
 [安装和配置参考](https://www.jianshu.com/p/ea88a0ceac19)
@@ -889,7 +889,7 @@ kubectl edit pv pv003
 ```
 ### pv被pvc绑定着，删除pv，会显示Terminating
 ## 10.3 pvc
-![](imgs/pvc架构.png)
+![](images/pvc架构.png)
 pvc配置
 ```
 apiVersion: v1
