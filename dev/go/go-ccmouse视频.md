@@ -29,6 +29,21 @@
 
 
 
-## 17-2 Docker和ElasticSearch介绍
+## 17-3 Docker的安装和使用
 
+### 安装elasticsearch
+* [安装文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html)
+```
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+docker run -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+或者
+docker pull elasticsearch:7.17.9
+docker run -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 -e "discovery.type=single-node" elasticsearch:7.17.9
+```
+## 17-4 ElasticSearch入门
+* <server>:9200/index/type/id
+  * index -> database
+  * type -> table
+* 全文搜索
+  * <server>:9200/<index>/<type>/_search?q=全文搜索
 

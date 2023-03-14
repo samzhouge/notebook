@@ -30,6 +30,12 @@
 ## Go系列教程
 [Go系列教程](https://studygolang.com/subject/2)
 
+## printf打印
+* %.3f 保留三位小数
+* %T 类型
+* %c 字符
+* %+v 打印结构体时候，会显示key
+
 ## 数组和切片
 ### 切片
 * 切片类型的零值为nil

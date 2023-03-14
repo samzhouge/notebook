@@ -58,16 +58,16 @@
 ---
 ## [GoLand常用快捷键](https://blog.51cto.com/quantfabric/2294263)
 ## 查看
-* CTRL+Q 显示注释文档CTRL+⇧+I 简短查看源定义
+* ⌃+Q 显示注释文档⌃+⇧+I 简短查看源定义
 
 ## 自动代码
-* [x] CTRL+⌥+V 自动生成表达式返回值（比如v,err=func()）
-* ⌥+INSERT 生成代码(如GET,SET方法,构造函数等)
-* CTRL+I 实现接口
+* [x] ⌃ ⌥ V 自动生成表达式返回值（比如v,err=func()）
+* ⌥ INSERT 生成代码(如GET,SET方法,构造函数等)
+* ⌃ I 实现接口
 * [x] 自定义模板
   * 转到 Preferences | Editor | Live Templates，并点击 +，新增动态模板
 
 # Keymap
-* 自定义光标跳转行尾
-  * 行尾 ctrl ;
-  * 行首 ctrl ⇧ ;
+* (win)自定义光标跳转行尾 | (mac)⌃e ⌃a
+  * 行尾 ⌃ ;
+  * 行首 ⌃ ⇧ ;
