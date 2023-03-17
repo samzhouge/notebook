@@ -44,7 +44,15 @@ copy(s2, s1)
 s2 = append(s2[:3], s2[4:]...)
 ```
 ## 3-4 Map
+* 除了slice,map,function的内建类型都可以作为key
+* Struct不包含上述类型，也可以作为key
 ```
+创建
+make(map[string]int)
+获取元素
+m[key]
+  key不存在是时候不报错，获得Value类型的零值
+判断key是否存在
 if name, ok := m["name"]; ok {
   fmt.Println(name)
 }
