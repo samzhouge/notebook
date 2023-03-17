@@ -15,7 +15,6 @@
 * 隐藏参数提示（对java有用，go不太有用）
   * parameter hint
     * show parameter name hints 取消勾选
-
 ### Goland 编辑器
 * editor/code style/go/sorting type/选择 goimports(默认是gofmt)
 * 隐藏参数
@@ -25,12 +24,39 @@
   * consts filename = "abc.txt"  // 不定义类型
   * 枚举 iota
 * rune 字符串类型 int32别名
-### 2-4 条件语句
+## 2-6 函数
+* 可变参数
+  * 例子 func sum(numbers ...int)
+    * sum(1,2,3)
+## 2-7 指针
+* 值传递 引用传递
+* go语言只有值传递
+## 3-1 数组
+## 3-2 切片的概念
+## 3-3 切片的操作
+```
+创建
+s1 := []int{2,4,6,8}
+s2 := make([]int, 10, 32)
+复制
+copy(s2, s1)
+删除[3]
+s2 = append(s2[:3], s2[4:]...)
+```
+## 3-4 Map
+```
+if name, ok := m["name"]; ok {
+  fmt.Println(name)
+}
+```
+## 3-5 Map例题
+## 3-6 字符和字符串处理
+
+
 
 
 
 ## 17-3 Docker的安装和使用
-
 ### 安装elasticsearch
 * [安装文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docker.html)
 ```
