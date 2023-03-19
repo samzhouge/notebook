@@ -27,3 +27,15 @@ git push -f [origin xxx]
 * 强行push -f到远程；
 * 同事使用pull命令拉取服务器代码；
 * 所有同事本地都要使用reset来回退版本；
+
+
+## 本地代码上传到新gitlab项目
+* gitlab创建新项目
+* 本地运行下面命令
+```
+git init
+git add .
+git commit -m "first commit"
+git remote add origin git@github.com:samzhouge/learngo.git
+git push -u origin master
+```
