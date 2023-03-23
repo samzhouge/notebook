@@ -102,8 +102,18 @@ for i, ch := range []rune(s) {
 * 往mod中添加模块
   * go mod tidy
 ## 5-4 目录的整理
-
+### go build
+* go build
+  * 当前目录生成可执行文件
+* go build ./...
+  * 检测所有子目录下main包是否可以编译通过
+### go install
+* go install
+  * 会把main包的生成可执行命令，放在$GOPATH/bin下
+*go install ./...
+  * 当前目录下所有子目录有main包的都会生成可执行文件
 ## 6-1 接口的概念
+
 ## 6-2 duck typing的概念
 ## 6-3 接口的定义和实现
 ## 6-4 接口的值类型
