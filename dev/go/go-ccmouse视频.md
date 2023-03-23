@@ -75,8 +75,40 @@ for i, ch := range []rune(s) {
 ## 4-3 扩展已有类型
 * 组合 和 别名
 ## 4-4 使用内嵌来扩展已有类型
+* 定义别名：最简单
+* 使用组合：最常用
+* 使用内嵌：省下许多代码
+## 5-1 依赖管理
+## 5-2 GOPATH 和 GOVENDOR
+* 关闭go mod，使用系统变量修改export GO111MODULE=off，go env -w修改会修改全局
+* 每个项目独立第三方包配置：在每个项目中创建vendor，各自管理依赖包，最好需要使用第三方包管理
+## 5-3 go mod的使用
+* 增加依赖(go get)
+  * go get -u go.uber.org/zap@1.24
+    * 不加版本，默认最新
+* 更新依赖
+  * go get [@v...]   再运行整理命令：go mod tidy
+    * 使用命令，而不是修改go.mod
+      * go get -u go.uber.org/zap@v1.23
+        * 显示：go: downgraded go.uber.org/zap v1.24.0 => v1.23.0
+* 整理go.mod内容
+  * go mod tidy  # 作用如下
+    * 项目中使用到的模块，添加到mod
+    * 清理不需要的模块
+    * 清理go.sum中不使用的
+### gopath或govendor项目迁移到go mod
+* 初始化
+  * go mod init [module]
+* 往mod中添加模块
+  * go mod tidy
+## 5-4 目录的整理
 
-
+## 6-1 接口的概念
+## 6-2 duck typing的概念
+## 6-3 接口的定义和实现
+## 6-4 接口的值类型
+## 6-5 接口的组合
+## 6-6 常用系统接口
 
 ## 17-3 Docker的安装和使用
 ### 安装elasticsearch
