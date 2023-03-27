@@ -19,6 +19,14 @@
 * editor/code style/go/sorting type/选择 goimports(默认是gofmt)
 * 隐藏参数
   * show parameter hints/去掉 GO
+
+### mac Goland编辑器的Go环境配置
+* GOROOT
+  * /usr/local/go
+* GOPATH
+  * /Users/samzhou/Desktop/studycode/studygo/gopath
+* Go Modules
+  * GOPROXY=https://goproxy.io,direct;GO111MODULE=on
 ## 2-3 常量与枚举
 * consts 数值可以作为各种类型使用
   * consts filename = "abc.txt"  // 不定义类型
@@ -113,10 +121,21 @@ for i, ch := range []rune(s) {
 *go install ./...
   * 当前目录下所有子目录有main包的都会生成可执行文件
 ## 6-1 接口的概念
-
+* 接口一般使用er结尾
 ## 6-2 duck typing的概念
 ## 6-3 接口的定义和实现
+* (下层)实现方 定义struct和方法
+* (上层)调用方 定义接口中包含的方法
+* 下层struct中包含接口定义的方法，这个struct实例就是这个 接口的类型
 ## 6-4 接口的值类型
+* 接口变量有什么
+![](./images/接口变量里面有什么.png)
+
+* 接口内部有两个内容
+  * 1、类型
+    * 获取类型：接口实例.(type)
+  * 2、值
+    * 获取值：接口实例.(接口类型).struct属性 (Type assertion)
 ## 6-5 接口的组合
 ## 6-6 常用系统接口
 
