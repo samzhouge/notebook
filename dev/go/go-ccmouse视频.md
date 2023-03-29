@@ -141,8 +141,14 @@ for i, ch := range []rune(s) {
   * type Queue []interface{}
 * 强制限定值的类型，例如限制v的类型为int：v.(int)
 ## 6-5 接口的组合
-
+```
+type ReaderWriter interface {
+  Reader
+  Writer
+}
+```
 ## 6-6 常用系统接口
+
 ## 7-1 函数式编程
 * 闭包
 ![](images/闭包.png)
