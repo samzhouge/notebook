@@ -136,6 +136,12 @@ for i, ch := range []rune(s) {
     * 获取类型：接口实例.(type)
   * 2、值
     * 获取值：接口实例.(接口类型).struct属性 (Type assertion)
+      * 断言 Type assertion
+        ```
+        if i, ok := 接口实例.(接口类型); ok {
+          接口实例.属性 ...
+        }
+        ```
 
 * 定义任何类型：interface{}
   * type Queue []interface{}
@@ -148,14 +154,44 @@ type ReaderWriter interface {
 }
 ```
 ## 6-6 常用系统接口
-
 ## 7-1 函数式编程
 * 闭包
 ![](images/闭包.png)
 ## 7-2 函数式编程例一
 ## 7-3 函数式编程例二
 ## 8-1 defer调用
+### 何时使用defer调用
+* Open/Close
+* Lock/Unlock
+* PrintHeader/PrintFooter
 ## 8-2 错误处理概念
+### error 内置接口，有个方法Error返回string
+```
+type error interface {
+	Error() string
+}
+```
+* 打印错误
+```
+fmt.Println("Error:", err.Error())
+fmt.Println("Error:", err)  // 会自动找到错误信息
+
+输出：Error: open fib.txt: file exists
+```
+
+### 错误断言
+* 判断错误类型
+```
+file, err := os.OpenFile(filename, os.O_EXCL|os.O_CREATE, 0666)
+if err != nil {
+    if pathError, ok := err.(*os.PathError); !ok {
+        panic(err)
+    } else {
+        fmt.Println(pathError.Op, pathError.Path, pathError.Err)
+    }
+    return
+}
+```
 ## 8-3 服务器统一出错处理
 ## 8-4 panic和recover
 ## 8-5 服务器统一出错处理2
