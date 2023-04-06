@@ -1,3 +1,8 @@
+# 安装
+* 设置网卡名为eth0
+  * 开始安装时候，按Tab键，修改网卡显示名eth0，在最下面quiet后面追加
+      * net.ifnames=0 biosdevname=0
+
 # 基础配置
 ## 配置yum源
 **直接使用官方源也可以，速度还可以**
@@ -74,8 +79,8 @@ umask 027
 EOF
 ```
 
-## vmware虚拟机模板配置
-**每次克隆创建虚拟机，需要网卡高级中重新生成mac地址**
+## vmware新建一个虚拟机
+设置mac地址，网卡适配器-网卡高级选项（在最下面，展开），生成MAC。不配置会每次也会自动生成。
 
 秘钥文件
 ```
@@ -110,3 +115,9 @@ swapoff -a
 yes | cp /etc/fstab /etc/fstab_bak
 cat /etc/fstab_bak |grep -v swap > /etc/fstab
 ```
+
+## 修改时区
+
+## 修改时间
+
+## 修改主机名
