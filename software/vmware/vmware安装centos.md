@@ -15,7 +15,9 @@
   * 按Tab键，修改网卡显示名eth0，在最下面quiet后面追加 （参考《跟老男孩学Linux运维》）
     * net.ifnames=0 biosdevname=0
   * 最小化安装
-  * root CentOS7!@#
+  * 设置root密码，比如：CentOS7!@#，按照自己来设置。满足复杂性要求，防止被黑客攻击。
 
 ## 克隆一个新虚拟机
 * 设置mac地址，网卡适配器-网卡高级选项（在最下面，展开），生成MAC。不配置会每次也会自动生成。
+
+## 安装vmware-tool
