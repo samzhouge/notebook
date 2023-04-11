@@ -39,3 +39,15 @@ git commit -m "first commit"
 git remote add origin git@github.com:samzhouge/learngo.git
 git push -u origin master
 ```
+## git stash暂存
+### 命令行操作
+```
+git stash  # 暂存
+git stash save 描述  # 暂存，并且添加描述
+git stash list  # 查看
+git stash apply stash@{0}  # 还原到某个暂存
+git stash pop  # 还原，并删除最后一个暂存
+git stash drop stash@{0}  # 删除暂存
+```
+### 图形化操作
+pycharm有图形化界面，更方便
