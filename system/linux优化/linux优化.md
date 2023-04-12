@@ -51,6 +51,8 @@ $ stress --cpu 1 --timeout 600
 -n, --dry-run 输出程序会做什么而并不实际执行相关的操作
 –version 显示版本号
 -v, --verbose 显示详细的信息
+
+stress升级版本 stress-ng
 ```
 
 pidstat命令
