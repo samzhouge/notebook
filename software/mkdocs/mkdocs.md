@@ -8,6 +8,13 @@ mkdocs build
 mkdocs serve
 ```
 
+## 主題
+修改 mkdocs.yml
+```
+theme:
+    name: readthedocs
+```
+
 ## 例子
 [教程](https://zhuanlan.zhihu.com/p/383582472)
 ```shell
