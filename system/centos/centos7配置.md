@@ -66,6 +66,10 @@ ClientAliveInterval 60
 systemctl restart sshd
 ```
 
+## 配置时间和ntp服务
+
+## 修改主机名
+
 ## profile配置
 profile配置，TMOUT登陆超时退出
 /etc/profile.d/文件名.sh
@@ -117,9 +121,3 @@ swapoff -a
 yes | cp /etc/fstab /etc/fstab_bak
 cat /etc/fstab_bak |grep -v swap > /etc/fstab
 ```
-
-## 修改时区
-
-## 修改时间
-
-## 修改主机名
