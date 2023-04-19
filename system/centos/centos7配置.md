@@ -70,6 +70,8 @@ systemctl restart sshd
 
 ## 修改主机名
 
+## 需改文件和进程数限制 limit
+
 ## profile配置
 profile配置，TMOUT登陆超时退出
 /etc/profile.d/文件名.sh
