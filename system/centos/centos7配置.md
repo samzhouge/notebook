@@ -22,10 +22,17 @@ yum repolist
 ```
 yum provides "*/ifconfig"  # 查询命令所在的包
 ```
+## 安装ifconfig
+```shell
+yum install network-tools
+systemctl start network && systemctl enable network
+```
 
 ## 安装基础软件
 ```shell
-yum install vim tree telnet bind-utils yum-utils nmap dos2unix lrzsz nc lsof wget tcpdump htop iftop iotop dstat sysstat nethogs strace psmisc nload perf bash-completion -y
+yum install -y vim tree bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
+yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf 
+yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 ```
 注:
 * bind-utils  # dig
@@ -35,6 +42,9 @@ yum install vim tree telnet bind-utils yum-utils nmap dos2unix lrzsz nc lsof wge
   * pidstat
 * nload # 网卡流量
 * bash-completion # 命令补全工具
+* bind-utils
+  * nslookup
+  * dig
 
 ## 关闭NetworkManager
 ```shell
@@ -51,12 +61,6 @@ setenforce 0
 sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
 ```
 
-## 安装ifconfig
-```shell
-yum install network-tools
-systemctl start network && systemctl enable network
-```
-
 ## ssh配置
 ```shell
 vim /etc/ssh/sshd_config
@@ -69,6 +73,8 @@ systemctl restart sshd
 ## 配置时间和ntp服务
 
 ## 修改主机名
+
+## 配置网卡
 
 ## 需改文件和进程数限制 limit
 
