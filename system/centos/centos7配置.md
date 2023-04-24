@@ -9,7 +9,7 @@
 
 [阿里源文档](https://developer.aliyun.com/mirror/centos?spm=a2c6h.13651102.0.0.3e221b111DMGEx)
 ```
-yum install wget
+yum install -y wget
 
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
@@ -24,17 +24,18 @@ yum provides "*/ifconfig"  # 查询命令所在的包
 ```
 ## 安装ifconfig
 ```shell
-yum install network-tools
+yum install -y network-tools
 systemctl start network && systemctl enable network
 ```
 
 ## 安装基础软件
 ```shell
-yum install -y vim tree bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
+yum install -y vim tree network-tools bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
 yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf 
 yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 ```
 注:
+* network-tools  # ifconfig
 * bind-utils  # dig
 * psmisc # pstree
 * sysstat # sar iostat opstat
