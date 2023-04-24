@@ -18,24 +18,14 @@ yum clean all && yum makecache
 yum repolist
 ```
 
-### yum命令
-```
-yum provides "*/ifconfig"  # 查询命令所在的包
-```
-## 安装ifconfig
-```shell
-yum install -y network-tools
-systemctl start network && systemctl enable network
-```
-
 ## 安装基础软件
 ```shell
-yum install -y vim tree network-tools bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
-yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf 
+yum install -y vim tree net-tools bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
+yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf
 yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 ```
 注:
-* network-tools  # ifconfig
+* net-tools  # ifconfig
 * bind-utils  # dig
 * psmisc # pstree
 * sysstat # sar iostat opstat
@@ -46,6 +36,11 @@ yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 * bind-utils
   * nslookup
   * dig
+
+### yum命令
+```
+yum provides "*/ifconfig"  # 查询命令所在的包
+```
 
 ## 关闭NetworkManager
 ```shell
