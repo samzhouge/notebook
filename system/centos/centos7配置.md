@@ -20,22 +20,27 @@ yum repolist
 
 ## 安装基础软件
 ```shell
-yum install -y vim tree net-tools bind-utils yum-utils dos2unix lrzsz lsof wget bash-completion
+yum install -y vim tree ntp net-tools bind-utils yum-utils unzip dos2unix lrzsz lsof wget bash-completion
 yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf
 yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 ```
 注:
-* net-tools  # ifconfig
-* bind-utils  # dig
-* psmisc # pstree
+* net-tools
+  - ifconfig
+  - route
+  - netstat
+* bind-utils
+  - dig
+* psmisc
+  - pstree
 * sysstat # sar iostat opstat
-  * mpstat
-  * pidstat
+  - mpstat
+  - pidstat
 * nload # 网卡流量
 * bash-completion # 命令补全工具
 * bind-utils
-  * nslookup
-  * dig
+  - nslookup
+  - dig
 
 ### yum命令
 ```
@@ -67,12 +72,42 @@ systemctl restart sshd
 ```
 
 ## 配置时间和ntp服务
+```
+- yum install -y ntp
+- 设置时区
+  - timedatectl set-timezone Asia/Shanghai
+  - 或者 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+- 手动同步时间 ntpdate ntp3.aliyun.com
+- 配置文件 /etc/ntp.conf
+- 启动服务
+  - systemctl start ntpd
+  - systemctl enable ntpd
+```
 
 ## 修改主机名
 
 ## 配置网卡
+- 参照 软件包安装 网络
 
-## 需改文件和进程数限制 limit
+## 需改文件和进程数限制 ulimit
+[参考](https://www.jianshu.com/p/2c398f08a0e2)
+### 最大打开文件描述符
+```shell
+echo "* soft nofile 65535" >> /etc/security/limits.conf
+echo "* hard nofile 65535" >> /etc/security/limits.conf
+  或则
+  echo "* - nofile 65535" >> /etc/security/limits.conf
+
+# 并且配置(提供对shell及其启动的进程的可用文件句柄的控制，这是进程级别的)
+echo "fs.file-max = 202808" >> /etc/sysctl.conf
+```
+### 最大用户进程数
+```shell
+echo "* soft nproc 65535" >> /etc/security/limits.conf
+echo "* hard nproc 65535" >> /etc/security/limits.conf
+```
+
+### 修改最大进程数
 
 ## profile配置
 profile配置，TMOUT登陆超时退出
