@@ -91,23 +91,25 @@ systemctl restart sshd
 
 ## 需改文件和进程数限制 ulimit
 [参考](https://www.jianshu.com/p/2c398f08a0e2)
-### 最大打开文件描述符
 ```shell
-echo "* soft nofile 65535" >> /etc/security/limits.conf
-echo "* hard nofile 65535" >> /etc/security/limits.conf
-  或则
-  echo "* - nofile 65535" >> /etc/security/limits.conf
+cat >> /etc/security/limits.conf << EOF
+* soft nproc 655360
+* hard nproc 655360
+* soft nofile 1000000
+* hard file 1000000
+* soft core 102400
+* hard core 102400
+* soft stack unlimited
+* hard stack unlimited
+EOF
+
+# 注：cat<<EOF，以EOF输入字符为标准输入结束
+```
 
 # 并且配置(提供对shell及其启动的进程的可用文件句柄的控制，这是进程级别的)
-echo "fs.file-max = 202808" >> /etc/sysctl.conf
 ```
-### 最大用户进程数
-```shell
-echo "* soft nproc 65535" >> /etc/security/limits.conf
-echo "* hard nproc 65535" >> /etc/security/limits.conf
+echo "fs.file-max = 1000000" >> /etc/sysctl.conf
 ```
-
-### 修改最大进程数
 
 ## profile配置
 profile配置，TMOUT登陆超时退出
