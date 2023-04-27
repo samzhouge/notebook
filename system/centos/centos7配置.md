@@ -92,7 +92,7 @@ systemctl restart sshd
 ## 需改文件和进程数限制 ulimit
 [参考](https://www.jianshu.com/p/2c398f08a0e2)
 ```shell
-cat >> /etc/security/limits.conf << EOF
+cat >> /etc/security/limits.conf << 'EOF'
 * soft nproc 655360
 * hard nproc 655360
 * soft nofile 1000000
@@ -103,11 +103,9 @@ cat >> /etc/security/limits.conf << EOF
 * hard stack unlimited
 EOF
 
-# 注：cat<<EOF，以EOF输入字符为标准输入结束
-```
+# 注：cat<<'EOF'，以EOF输入字符为标准输入结束
 
 # 并且配置(提供对shell及其启动的进程的可用文件句柄的控制，这是进程级别的)
-```
 echo "fs.file-max = 1000000" >> /etc/sysctl.conf
 ```
 
@@ -116,13 +114,15 @@ profile配置，TMOUT登陆超时退出
 /etc/profile.d/文件名.sh
 注：TMOUT表示多少秒没活动，断开终端
 ```shell
-cat > /etc/profile.d/me.sh <<EOF
+cat > /etc/profile.d/me.sh << 'EOF'
 TMOUT=3600
 readonly TMOUT
 export TMOUT
 export HISTSIZE=5000
 export HISTTIMEFORMAT='%F %T '
 umask 027
+export PS1='\n\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;36m\h\e[m \e[4m`pwd`\e[m\e[1;37m]\e[m\e[1;36m\e[m\n\$'
+alias grep='grep --color=auto'
 EOF
 ```
 

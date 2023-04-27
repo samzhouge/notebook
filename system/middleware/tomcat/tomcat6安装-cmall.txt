@@ -1,0 +1,185 @@
+步骤：
+1、初始化Centos6.x
+2、安装tomcat6
+3、安装imagemagick
+4、防火墙iptables
+
+
+一、初始化Centos6.x
+EC2磁盘容量修改，如果选择磁盘不是默认的8G，需要运行如下命令来增加磁盘（aws）
+resize2fs /dev/xvde
+
+安装基础软件
+yum -y install sysstat lrzsz vim dstat telnet screen unzip 
+
+修改history
+sed -i 's/HISTSIZE=1000/HISTSIZE=2000/' /etc/profile
+sed -i '/HISTSIZE=2000/a\HISTTIMEFORMAT="%F %T "' /etc/profile
+
+修改PS1
+cat <<- 'EOF' >>/etc/profile.d/arts.sh
+export PS1='\n\e[1;37m[\e[m\e[1;32m\u\e[m\e[1;33m@\e[m\e[1;36m\h\e[m \e[4m`pwd`\e[m\e[1;37m]\e[m\e[1;36m\e[m\n\$'
+alias grep='grep --color=auto'
+EOF
+
+禁用IPv6
+grep NETWORKING_IPV6 /etc/sysconfig/network|| echo 'NETWORKING_IPV6=no' >>/etc/sysconfig/network
+cat <<- EOF >/etc/modprobe.d/disable_ipv6.conf
+alias net-pf-10 off
+options ipv6 disable=1
+EOF
+
+修改ulimit值（aws）
+cat >> /etc/security/limits.conf << 'EOF'
+*       soft    nproc   65535
+*       hard    nproc   65535
+*       soft    nofile  65535
+*       hard    nofile  65535
+EOF
+
+
+二、安装Tomcat
+
+防火墙放行端口（aws）
+
+安装jdk
+chmod +x jdk-6u45-linux-x64-rpm.bin
+./jdk-6u45-linux-x64-rpm.bin
+
+添加java至环境变量
+cat > /etc/profile.d/java.sh << 'EOF'
+export JAVA_HOME=/usr/java/latest
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+EOF
+
+source /etc/profile.d/java.sh
+
+创建工作用户deploy
+groupadd -g 1000 deploy
+useradd -g deploy -u 1000 deploy
+
+安装tomcat6
+tar xf apache-tomcat-6.0.43.tar.gz
+mv apache-tomcat-6.0.43 /usr/local/tomcat6
+chown -R deploy.deploy /usr/local/tomcat6
+
+设置tomcat环境变量
+cat > /etc/profile.d/tomcat.sh << 'EOF'
+export CATALINA_HOME=/usr/local/tomcat6
+export PATH=$CATALINA_HOME/bin:$PATH
+EOF
+
+. /etc/profile.d/tomcat.sh
+
+添加启动脚本
+mkdir /depot
+cat > /depot/tomcat.sh << 'EOF'
+JAVA_HOME=/usr/java/latest
+CATALINA_HOME=/usr/local/tomcat6
+export JAVA_HOME CATALINA_HOME
+if [ $UID -eq 0 ]; then
+    echo "Please use deploy user to start tomcat"
+    exit 1
+fi
+$CATALINA_HOME/bin/catalina.sh $*
+EOF
+
+chmod +x /depot/tomcat.sh
+chown -R deploy.deploy /depot/
+
+配置tomcat开机启动
+grep "tomcat.sh" /var/spool/cron/deploy &> /dev/null || cat >> /var/spool/cron/deploy << 'EOF'
+@reboot /bin/bash /depot/tomcat.sh start
+EOF
+
+chown deploy.deploy /var/spool/cron/deploy
+chmod 600 /var/spool/cron/deploy
+
+Tomcat启动参数
+编辑/usr/local/tomcat6/bin/catalina.sh，添加如下（-Xms4096m -Xmx4096m中的值一般为物理内存的一半）
+JAVA_OPTS='-server -Xms2048m -Xmx2048m -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:NewSize=512m -XX:MaxPermSize=256m'
+
+Tomcat日志切割
+cat > /etc/logrotate.d/tomcat << 'EOF'
+/usr/local/tomcat6/logs/catalina.out {
+daily
+compress
+copytruncate
+notifempty
+rotate 3
+missingok
+}
+/usr/local/tomcat6/logs/*.log {
+daily
+compress
+copytruncate
+notifempty
+rotate 3
+missingok
+}
+EOF
+
+放入计划任务
+#crontab -l
+1 0 * * * /usr/sbin/logrotate -f /etc/logrotate.d/tomcat
+30 0 * * * find /usr/local/tomcat6/logs -ctime +6 | xargs rm -f > /dev/null 2>&1
+
+Tomcat log访问日志配置
+<Valve className="org.apache.catalina.valves.AccessLogValve" rotatable="true"
+directory="logs" prefix="access.log." suffix=".log"
+pattern="%h %{X-FORWARDED-FOR}i %l %u %t %r %s %b %q %{User-Agent}i %T %D" resolveHosts="false"/>
+位置如下：
+<Host appBase="webapps" name="localhost"  >
+	<Context displayName="Welcome to Tomcat" docBase="/var/www/webapps/inshop-order-web" path="/order" reloadable="false" />
+        <Valve className="org.apache.catalina.valves.AccessLogValve" rotatable="true"
+        directory="logs" prefix="access.log." suffix=".log"
+        pattern="%h %{X-FORWARDED-FOR}i %l %u %t %r %s %b %q %{User-Agent}i %T %D" resolveHosts="false"/>
+</Host>
+
+
+三、安装imagemagick
+安装依赖软件
+yum -y install zlib-devel libjpeg-turbo-devel libpng-devel freetype-devel libtiff-devel pango-devel fontconfig-devel openjpeg-libs libxml2-devel gcc make
+
+安装imagemagick
+tar xf ImageMagick-6.9.0-2.tar.gz
+cd ImageMagick-6.9.0-2
+./configure --prefix=/usr/local/imagemagick
+make && make install
+
+添加环境变量
+cat > /etc/profile.d/imagemagick.sh << 'EOF'
+export PATH=/usr/local/imagemagick/bin:$PATH
+EOF
+
+source /etc/profile.d/imagemagick.sh
+
+
+安装libXtst libXp libXt
+yum -y install libXtst libXp libXt
+
+问题：png图片20像素边处理，报错如下
+	Caused by: java.lang.UnsatisfiedLinkError: /usr/java/jdk1.6.0_45/jre/lib/amd64/xawt/libmawt.so: libXtst.so.6: cannot open shared object file: No such file or directory
+查看这个包是属于哪个rpm安装包
+	yum provides */libXtst.so.6
+		libXtst-1.2.2-2.1.el6.x86_64 : X.Org X11 libXtst runtime library
+解决：
+	yum -y install libXtst
+检查：查看依赖的库是否已安装
+	ldd /usr/java/jdk1.6.0_45/jre/lib/amd64/xawt/libmawt.so
+		libXtst.so.6 => /usr/lib64/libXtst.so.6 (0x00007ffc367f9000)
+
+参考：
+http://blog.csdn.net/maoxiang/article/details/5747109
+
+
+四、iptables
+	保存规则：
+		service iptables save
+			保存至/etc/sysconfig/iptables
+		iptables-save > /path/to/iptables.rules
+	生效规则文件中的规则：
+		iptables-restore < /path/to/ipables.rules
+
+		
