@@ -20,7 +20,7 @@ yum repolist
 
 ## 安装基础软件
 ```shell
-yum install -y vim tree ntp net-tools bind-utils yum-utils unzip dos2unix lrzsz lsof wget bash-completion
+yum install -y vim tree ntp gcc net-tools bind-utils yum-utils unzip dos2unix lrzsz lsof wget bash-completion
 yum install -y htop iftop iotop dstat sysstat nethogs strace psmisc nload perf
 yum install -y telnet nmap nc tcpdump traceroute mtr bind-utils
 ```
